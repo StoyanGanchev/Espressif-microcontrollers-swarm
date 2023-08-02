@@ -1,44 +1,20 @@
-#include <Arduino.h>
-#include "connection_and_communication.h"
+#include <ESP32SwarmComm.h>
 
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
-const char* mqttBroker = "MQTT_BROKER_IP";
-const int mqttPort = 1883;
-const char* mqttUsername = "MQTT_USERNAME"; // Optional, if your broker requires authentication
-const char* mqttPassword = "MQTT_PASSWORD"; // Optional, if your broker requires authentication
+// Replace with your Wi-Fi network credentials and MQTT broker information
+const char* ssid = "your_wifi_ssid";
+const char* password = "your_wifi_password";
+const char* mqttBroker = "your_mqtt_broker_address";
+const int mqttPort = 1883; // Default MQTT port
 
-MQTTConnection mqttConnection(ssid, password, mqttBroker, mqttPort, mqttUsername, mqttPassword);
-
-// Callback function to be executed when an MQTT message is received
-void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Received message [");
-  Serial.print(topic);
-  Serial.print("]: ");
-  for (unsigned int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
-  // Add your custom logic based on the received MQTT message here
-}
+ESP32SwarmComm swarmComm(ssid, password, mqttBroker, mqttPort);
 
 void setup() {
   Serial.begin(115200);
-
-  mqttConnection.setup();
-
-  // Set the callback function to be executed when an MQTT message is received
-  mqttConnection.setCallback(mqttCallback);
-
-  // Subscribe to the desired MQTT topic
-  mqttConnection.subscribe("esp32/command");
+  delay(2000);
+  swarmComm.setup();
 }
 
 void loop() {
-  if (!mqttConnection.isConnected()) {
-    mqttConnection.reconnect();
-  }
-  mqttConnection.loop();
-
-  // Your main application code here
+  swarmComm.loop();
+  // Your main swarm behavior code goes here...
 }
