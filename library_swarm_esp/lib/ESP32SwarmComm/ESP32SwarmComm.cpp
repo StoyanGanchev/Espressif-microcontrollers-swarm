@@ -1,53 +1,53 @@
 #include "ESP32SwarmComm.h"
 
-ESP32SwarmComm::ESP32SwarmComm(const char* ssid, const char* password, const char* mqttBroker, int mqttPort)
-    : ssid(ssid), password(password), mqttBroker(mqttBroker), mqttPort(mqttPort), client(espClient) {}
+MyESP32Library::MyESP32Library() {
+  lastPublishTime = 0;
+}
 
-void ESP32SwarmComm::setup() {
-  WiFi.begin(ssid, password);
+void MyESP32Library::setup(const char* wifiSSID, const char* wifiPassword, const char* mqttBroker, int mqttPort, const char* mqttUsername, const char* mqttPassword) {
+  this->wifiSSID = wifiSSID;
+  this->wifiPassword = wifiPassword;
+  this->mqttBroker = mqttBroker;
+  this->mqttPort = mqttPort;
+  this->mqttUsername = mqttUsername;
+  this->mqttPassword = mqttPassword;
+  
+  Serial.begin(115200);
+  WiFi.begin(wifiSSID, wifiPassword);
+  
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(500);
+    Serial.print(".");
   }
+  
+  Serial.println("\nConnected to WiFi.");
+  mqttClient.setServer(mqttBroker, mqttPort);
+}
 
-  client.setServer(mqttBroker, mqttPort);
-  client.setCallback([this](char* topic, byte* payload, unsigned int length) {
-    this->callback(topic, payload, length);
-  });
-
-  while (!client.connected()) {
-    if (client.connect("esp32_robot")) {
-      connected = true;
+void MyESP32Library::loop() {
+  if (!mqttClient.connected()) {
+    Serial.println("Connecting to MQTT broker...");
+    
+    if (mqttClient.connect("ESP32Client", mqttUsername, mqttPassword)) {
+      Serial.println("Connected to MQTT broker.");
     } else {
+      Serial.print("MQTT connection failed, rc=");
+      Serial.print(mqttClient.state());
+      Serial.println(". Retrying in 5 seconds...");
       delay(5000);
+      return;
     }
+  }
+
+  mqttClient.loop();
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastPublishTime >= publishInterval) {
+    sendData("topic/1", "Hello from ESP32!");
+    lastPublishTime = currentMillis;
   }
 }
 
-void ESP32SwarmComm::loop() {
-  if (!client.connected()) {
-    while (!client.connected()) {
-      if (client.connect("esp32_robot")) {
-        connected = true;
-      } else {
-        delay(5000);
-      }
-    }
-  }
-  client.loop();
-}
-
-bool ESP32SwarmComm::publish(const char* topic, const char* payload) {
-  return client.publish(topic, payload);
-}
-
-bool ESP32SwarmComm::subscribe(const char* topic) {
-  return client.subscribe(topic);
-}
-
-bool ESP32SwarmComm::isConnected() {
-  return connected;
-}
-
-void ESP32SwarmComm::callback(char* topic, byte* payload, unsigned int length) {
-  // Handle incoming MQTT messages here...
+void MyESP32Library::sendData(const char* topic, const char* message) {
+  mqttClient.publish(topic, message);
 }

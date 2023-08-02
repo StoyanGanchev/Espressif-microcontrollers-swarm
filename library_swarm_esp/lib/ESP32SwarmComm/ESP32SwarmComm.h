@@ -1,28 +1,26 @@
 #ifndef ESP32_SWARM_COMM_H
 #define ESP32_SWARM_COMM_H
 
-#include <Arduino.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-class ESP32SwarmComm {
+class MyESP32Library {
 public:
-  ESP32SwarmComm(const char* ssid, const char* password, const char* mqttBroker, int mqttPort);
-  void setup();
+  MyESP32Library();
+  void setup(const char* wifiSSID, const char* wifiPassword, const char* mqttBroker, int mqttPort, const char* mqttUsername, const char* mqttPassword);
   void loop();
-  bool publish(const char* topic, const char* payload);
-  bool subscribe(const char* topic);
-  bool isConnected();
-
+  void sendData(const char* topic, const char* message);
+  
 private:
-  const char* ssid;
-  const char* password;
+  WiFiClient wifiClient;
+  PubSubClient mqttClient;
+  const char* wifiSSID;
+  const char* wifiPassword;
   const char* mqttBroker;
   int mqttPort;
-  WiFiClient espClient;
-  PubSubClient client;
-  bool connected = false;
-  void callback(char* topic, byte* payload, unsigned int length);
+  const char* mqttUsername;
+  const char* mqttPassword;
+  unsigned long lastPublishTime;
+  const unsigned long publishInterval = 5000; // 5 seconds
 };
-
 #endif
