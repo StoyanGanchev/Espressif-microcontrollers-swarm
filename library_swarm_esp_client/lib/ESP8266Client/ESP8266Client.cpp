@@ -1,10 +1,10 @@
-#include "ESP32Client.h"
+#include "ESP8266Client.h"
 
-ESP32Client::ESP32Client() : mqttClient(wifiClient) {
+ESP8266Client::ESP8266Client() : mqttClient(wifiClient) {
   // Initialize variables
 }
 
-void ESP32Client::setupClient(const char* ssid, const char* password, const char* mqttBroker, int mqttPort) {
+void ESP8266Client::setupClient(const char* ssid, const char* password, const char* mqttBroker, int mqttPort) {
   this->ssid = ssid;
   this->password = password;
   this->mqttBroker = mqttBroker;
@@ -21,9 +21,9 @@ void ESP32Client::setupClient(const char* ssid, const char* password, const char
   mqttClient.setServer(mqttBroker, mqttPort);
 }
 
-void ESP32Client::loop() {
+void ESP8266Client::loop() {
   if (!mqttClient.connected()) {
-    if (mqttClient.connect("ESP32Client")) {
+    if (mqttClient.connect("ESP8266Client")) {
       Serial.println("Connected to MQTT broker");
       mqttClient.subscribe("topic/test"); // Subscribe to the topic from the broker
     }
@@ -32,6 +32,6 @@ void ESP32Client::loop() {
   mqttClient.loop();
 }
 
-void ESP32Client::setMessageCallback(void (*callback)(char*, byte*, unsigned int)) {
+void ESP8266Client::setMessageCallback(void (*callback)(char*, byte*, unsigned int)) {
   mqttClient.setCallback(callback);
 }

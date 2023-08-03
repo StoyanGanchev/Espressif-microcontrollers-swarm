@@ -1,12 +1,12 @@
-#ifndef ESP32Client_h
-#define ESP32Client_h
+#ifndef ESP8266Client_h
+#define ESP8266Client_h
 
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-class ESP32Client {
+class ESP8266Client {
 public:
-  ESP32Client();
+  ESP8266Client();
   void setupClient(const char* ssid, const char* password, const char* mqttBroker, int mqttPort);
   void loop();
   void setMessageCallback(void (*callback)(char*, byte*, unsigned int));
