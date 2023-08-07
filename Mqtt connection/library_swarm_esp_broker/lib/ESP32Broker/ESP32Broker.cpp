@@ -17,14 +17,18 @@ void ESP32Broker::setupBroker(const char* ssid, const char* password, const char
     delay(500);
   }
   Serial.println("\nConnected to Wi-Fi");
+  Serial.println(WiFi.localIP());
   
   wifiServer.begin();
 
   mqttClient.setServer(mqttBroker, mqttPort);
+    Serial.println("MQTT server set");
+
 }
 
 void ESP32Broker::loop() {
   WiFiClient newClient = wifiServer.available();
+  Serial.println("Waiting for new found client");
   if (newClient) {
     Serial.println("New client connected");
     wifiClient = newClient;
@@ -32,7 +36,9 @@ void ESP32Broker::loop() {
   }
 
   if (!mqttClient.connected()) {
-    if (mqttClient.connect("ESP32Broker")) {
+    Serial.println("ERROR");
+   Serial.println(mqttClient.state());
+    if (mqttClient.connect("ESP32Broker")) {  //error
       Serial.println("Connected to MQTT broker");
     }
   }

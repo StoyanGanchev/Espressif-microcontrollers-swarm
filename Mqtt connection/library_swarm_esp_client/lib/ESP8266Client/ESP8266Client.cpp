@@ -12,17 +12,20 @@ void ESP8266Client::setupClient(const char* ssid, const char* password, const ch
 
   WiFi.begin(ssid, password);
   Serial.print("Connecting to Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED) {//IP: 192.168.0.253
     Serial.print(".");
     delay(500);
   }
   Serial.println("\nConnected to Wi-Fi");
+  Serial.println(WiFi.localIP());
   
   mqttClient.setServer(mqttBroker, mqttPort);
+  Serial.println("MQTT client set");
 }
 
 void ESP8266Client::loop() {
   if (!mqttClient.connected()) {
+    Serial.println("Searching for MQTT broker");
     if (mqttClient.connect("ESP8266Client")) {
       Serial.println("Connected to MQTT broker");
       mqttClient.subscribe("topic/test"); // Subscribe to the topic from the broker

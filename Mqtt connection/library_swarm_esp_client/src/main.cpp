@@ -1,9 +1,9 @@
 #include <ESP8266Client.h>
 
 // Replace these values with your Wi-Fi credentials and MQTT broker details
-const char* client_ssid = "your_wifi_ssid";
-const char* client_password = "your_wifi_password";
-const char* client_mqttBroker = "your_mqtt_broker_ip";
+const char* client_ssid = "un-hall";
+const char* client_password = "banbanban";
+const char* client_mqttBroker = "192.168.0.249";
 int client_mqttPort = 1883;
 
 ESP8266Client client;
@@ -20,4 +20,5 @@ void setup() {
 
 void loop() {
   client.loop();
+  delay(5000);
 }
